@@ -21,10 +21,10 @@ import numpy as np
 
 # 4. Print the following the statement: Hello Capstone Project Course!
 
-# In[3]:
+# In[4]:
 
 
-print('Hello Cpastone Project Course!')
+print('Hello Capstone Project Course!')
 
 
 # In[ ]:
