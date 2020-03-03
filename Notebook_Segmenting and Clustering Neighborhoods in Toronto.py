@@ -3,14 +3,14 @@
 
 # # Notebook- "Segmenting and Clustering Neighborhoods in Toronto"
 
-# In[2]:
+# In[1]:
 
 
 import numpy as np
 import pandas as pd
 
 
-# In[3]:
+# In[2]:
 
 
 # Installing beautifulsoup package, lxml parser and requests
@@ -23,14 +23,14 @@ import sys
 # Use the Notebook to build the code to scrape the following Wikipedia page, https://en.wikipedia.org/wiki/List_of_postal_codes_of_Canada:_M, in order to obtain the data that is in the table of postal codes and to transform the data into a pandas dataframe
 # 
 
-# In[4]:
+# In[3]:
 
 
 import requests
 website_url = requests.get('https://en.wikipedia.org/wiki/List_of_postal_codes_of_Canada:_M').text
 
 
-# In[5]:
+# In[4]:
 
 
 from bs4 import BeautifulSoup
@@ -40,20 +40,20 @@ print(soup.prettify())
 
 # # By observation we can see that the tabular data is availabe in table and belongs to class="wikitable sortable"So let's extract only table¶
 
-# In[6]:
+# In[5]:
 
 
 My_table = soup.find('table',{'class':'wikitable sortable'})
 My_table
 
 
-# In[7]:
+# In[6]:
 
 
 print(My_table.tr.text)
 
 
-# In[8]:
+# In[7]:
 
 
 headers="Postcode,Borough,Neighbourhood"
@@ -61,7 +61,7 @@ headers="Postcode,Borough,Neighbourhood"
 
 # # Geting all values in tr and seperating each td within by ","
 
-# In[9]:
+# In[8]:
 
 
 table1=""
@@ -75,7 +75,7 @@ print(table1)
 
 # # Writing table data into .csv file for further usage
 
-# In[10]:
+# In[9]:
 
 
 file=open("toronto.csv","wb")
@@ -83,18 +83,20 @@ file=open("toronto.csv","wb")
 file.write(bytes(table1,encoding="ascii",errors="ignore"))
 
 
+# ------------------------------------------------------------------------------------------------------------
 # # Part- I
+# ------------------------------------------------------------------------------------------------------------
 
 # # 1. Create a dataframe consists of three columns: PostalCode, Borough, and Neighborhood
 
-# In[11]:
+# In[10]:
 
 
 df = pd.read_csv('toronto.csv',header=None)
 df.columns=["Postalcode","Borough","Neighbourhood"]
 
 
-# In[12]:
+# In[11]:
 
 
 df.head(10)
@@ -102,7 +104,7 @@ df.head(10)
 
 # # 2. Only process the cells that have an assigned borough. Ignore cells with a borough that is Not assigned.
 
-# In[13]:
+# In[12]:
 
 
 # Get names of indexes for which column Borough has value "Not assigned"
@@ -112,7 +114,7 @@ indexNames = df[ df['Borough'] =='Not assigned'].index
 df.drop(indexNames , inplace=True)
 
 
-# In[14]:
+# In[13]:
 
 
 df.head(10)
@@ -120,7 +122,7 @@ df.head(10)
 
 # # 3. If a cell has a borough but a Not assigned neighborhood, then the neighborhood will be the same as the borough
 
-# In[15]:
+# In[14]:
 
 
 df.loc[df['Neighbourhood'] =='Not assigned' , 'Neighbourhood'] = df['Borough']
@@ -129,7 +131,7 @@ df.head(10)
 
 # # 4. More than one neighborhood can exist in one postal code area. For example, in the table on the Wikipedia page, you will notice that M6A is listed twice and has two neighborhoods: Harbourfront and Regent Park. These two rows will be combined into one row with the neighborhoods separated with a comma
 
-# In[16]:
+# In[15]:
 
 
 result = df.groupby(['Postalcode','Borough'], sort=False).agg( ', '.join)
@@ -139,18 +141,20 @@ df_new.head(15)
 
 # # 5. In the last cell of your notebook, use the .shape method to print the number of rows of your dataframe.
 
-# In[17]:
+# In[16]:
 
 
 df_new.shape
 
 
+# -----------------------------------------------------------------------------------------------------------------
 # # Part- II
+# -----------------------------------------------------------------------------------------------------------------
 
 # # Use the Geocoder package or the csv file to create dataframe with longitude and latitude values
 # We will be using a csv file that has the geographical coordinates of each postal code: http://cocl.us/Geospatial_data
 
-# In[18]:
+# In[17]:
 
 
 get_ipython().system("wget -q -O 'Torronto_geospatial_data.csv'  http://cocl.us/Geospatial_data")
@@ -158,20 +162,20 @@ df_lon_lat = pd.read_csv('Torronto_geospatial_data.csv')
 df_lon_lat.head()
 
 
-# In[19]:
+# In[18]:
 
 
 df_lon_lat.rename(columns = {'Postal Code': 'Postalcode'}, inplace = True)
 df_lon_lat.head()
 
 
-# In[20]:
+# In[19]:
 
 
 df_new.shape, df_lon_lat.shape
 
 
-# In[21]:
+# In[20]:
 
 
 Toronto_df = pd.merge(df_new,
@@ -180,7 +184,9 @@ Toronto_df = pd.merge(df_new,
 Toronto_df.head(10)
 
 
+# -------------------------------------------------------------------------------------------------------------------------------
 # # Part- III
+# ---------------------------------------------------------------------------------------------------------------------------------
 
 # Explore and cluster the neighborhoods in Toronto. You can decide to work with only boroughs that contain the word Toronto and then replicate the same analysis we did to the New York City data. It is up to you.
 # 
@@ -192,7 +198,7 @@ Toronto_df.head(10)
 
 # # Use geopy library to get the latitude and longitude values of New York City.
 
-# In[23]:
+# In[24]:
 
 
 from geopy.geocoders import Nominatim # convert an address into latitude and longitude values
@@ -222,7 +228,7 @@ longitude_toronto = location.longitude
 print('The geograpical coordinate of Toronto are {}, {}.'.format(latitude_toronto, longitude_toronto))
 
 
-# In[29]:
+# In[26]:
 
 
 map_toronto = folium.Map(location=[latitude_toronto, longitude_toronto], zoom_start=10)
@@ -246,7 +252,7 @@ map_toronto
 
 # # Define Foursquare credentials and version
 
-# In[30]:
+# In[27]:
 
 
 CLIENT_ID = 'VNWUPMJJ2PQDRXITPENQP1AUGWWWQ2ZDDOECVNX40WXAMVIQ' # your Foursquare ID
@@ -259,7 +265,7 @@ print('CLIENT_ID: ' + CLIENT_ID)
 print('CLIENT_SECRET:' + CLIENT_SECRET)
 
 
-# In[31]:
+# In[28]:
 
 
 
@@ -304,7 +310,7 @@ def getNearbyVenues(names, latitudes, longitudes, radius=500):
     return(nearby_venues)
 
 
-# In[32]:
+# In[29]:
 
 
 toronto_venues = getNearbyVenues(names=Toronto_df['Neighbourhood'],
@@ -315,19 +321,19 @@ toronto_venues = getNearbyVenues(names=Toronto_df['Neighbourhood'],
 
 # # Checking the venues and size of dataframe
 
-# In[33]:
+# In[30]:
 
 
 toronto_venues.head(10)
 
 
-# In[34]:
+# In[31]:
 
 
 toronto_venues.shape
 
 
-# In[35]:
+# In[32]:
 
 
 toronto_venues.groupby('Neighbourhood').count()
@@ -337,7 +343,7 @@ toronto_venues.groupby('Neighbourhood').count()
 
 # 1. Converting Venue category to numeric ie., one hot encoding
 
-# In[37]:
+# In[33]:
 
 
 toronto_onehot = pd.get_dummies(toronto_venues[['Venue Category']], prefix="", prefix_sep="")
@@ -350,7 +356,7 @@ fixed_columns = [toronto_onehot.columns[-1]] + list(toronto_onehot.columns[:-1])
 toronto_onehot.head()
 
 
-# In[38]:
+# In[34]:
 
 
 toronto_onehot.shape
@@ -358,7 +364,7 @@ toronto_onehot.shape
 
 # 2. Grouping rows by neighborhood and by taking the mean of the frequency of occurrence of each category
 
-# In[39]:
+# In[35]:
 
 
 toronto_grouped = toronto_onehot.groupby('Neighbourhood').mean().reset_index()
@@ -367,7 +373,7 @@ toronto_grouped
 
 # # Print each neighborhood along with the top 5 most common venues
 
-# In[40]:
+# In[36]:
 
 
 def return_most_common_venues(row, num_top_venues):
@@ -379,7 +385,7 @@ def return_most_common_venues(row, num_top_venues):
 
 # # Top 10 venues for each neigborhood
 
-# In[42]:
+# In[37]:
 
 
 num_top_venues = 10
@@ -408,7 +414,7 @@ neighbourhoods_venues_sorted.head(10)
 
 # Run k-means to cluster the neighborhood into 5 clusters.
 
-# In[43]:
+# In[38]:
 
 
 # set number of clusters
@@ -424,7 +430,7 @@ kmeans.labels_
 # to change use .astype()
 
 
-# In[44]:
+# In[39]:
 
 
 # add clustering labels
@@ -438,7 +444,7 @@ toronto_merged = toronto_merged.join(neighbourhoods_venues_sorted.set_index('Nei
 toronto_merged.head() # check the last columns!
 
 
-# In[47]:
+# In[40]:
 
 
 toronto_merged=toronto_merged.dropna()
@@ -448,7 +454,7 @@ toronto_merged=toronto_merged.dropna()
 
 # # Cluster 1
 
-# In[48]:
+# In[41]:
 
 
 toronto_merged.loc[toronto_merged['Cluster_Labels'] == 0, toronto_merged.columns[[1] + list(range(5, toronto_merged.shape[1]))]]
@@ -456,7 +462,7 @@ toronto_merged.loc[toronto_merged['Cluster_Labels'] == 0, toronto_merged.columns
 
 # # Cluster 2
 
-# In[49]:
+# In[42]:
 
 
 toronto_merged.loc[toronto_merged['Cluster_Labels'] == 1, toronto_merged.columns[[1] + list(range(5, toronto_merged.shape[1]))]]
@@ -464,7 +470,7 @@ toronto_merged.loc[toronto_merged['Cluster_Labels'] == 1, toronto_merged.columns
 
 # # Cluster 3
 
-# In[50]:
+# In[43]:
 
 
 toronto_merged.loc[toronto_merged['Cluster_Labels'] == 2, toronto_merged.columns[[1] + list(range(5, toronto_merged.shape[1]))]]
@@ -472,7 +478,7 @@ toronto_merged.loc[toronto_merged['Cluster_Labels'] == 2, toronto_merged.columns
 
 # # Cluster 4
 
-# In[51]:
+# In[44]:
 
 
 toronto_merged.loc[toronto_merged['Cluster_Labels'] == 3, toronto_merged.columns[[1] + list(range(5, toronto_merged.shape[1]))]]
@@ -480,13 +486,13 @@ toronto_merged.loc[toronto_merged['Cluster_Labels'] == 3, toronto_merged.columns
 
 # # Cluster 5
 
-# In[52]:
+# In[45]:
 
 
 toronto_merged.loc[toronto_merged['Cluster_Labels'] == 4, toronto_merged.columns[[1] + list(range(5, toronto_merged.shape[1]))]]
 
 
-# In[56]:
+# In[46]:
 
 
 # create map
