@@ -5,7 +5,7 @@
 
 # # Presented by Surya Teja Challapalli, Senior Data Scientist @ Hyderabad, India
 
-# In[2]:
+# In[1]:
 
 
 import numpy as np
@@ -100,7 +100,7 @@ print('Libraries imported succesfully and can be used further..')
 
 # # Reference of venues around current residence in Singapore for comparison to Manhattan place
 
-# In[11]:
+# In[2]:
 
 
 # Shenton Way, District 01, Singapore
@@ -113,7 +113,7 @@ longitude = location.longitude
 print('The geograpical coordinates of Singapore home are {}, {}.'.format(latitude, longitude))
 
 
-# In[5]:
+# In[3]:
 
 
 neighborhood_latitude=1.2792655
@@ -122,7 +122,7 @@ neighborhood_longitude=103.8480938
 
 # # Let's move on and define FourSquare credentials and version, used to explore venues based out of categories around Singapore home
 
-# In[10]:
+# In[4]:
 
 
 CLIENT_ID = 'VNWUPMJJ2PQDRXITPENQP1AUGWWWQ2ZDDOECVNX40WXAMVIQ' # your Foursquare ID
@@ -134,7 +134,7 @@ print('CLIENT_ID: ' + CLIENT_ID)
 print('CLIENT_SECRET:' + CLIENT_SECRET)
 
 
-# In[8]:
+# In[5]:
 
 
 LIMIT = 100
@@ -152,13 +152,13 @@ url = 'https://api.foursquare.com/v2/venues/explore?&client_id={}&client_secret=
 url # display URL
 
 
-# In[9]:
+# In[6]:
 
 
 results = requests.get(url).json()
 
 
-# In[12]:
+# In[7]:
 
 
 # function that extracts the category of the venue
@@ -174,7 +174,7 @@ def get_category_type(row):
         return categories_list[0]['name']
 
 
-# In[13]:
+# In[8]:
 
 
 venues = results['response']['groups'][0]['items']
@@ -196,7 +196,7 @@ SGnearby_venues.head(10)
 
 # # Lets depict in map for reference 
 
-# In[24]:
+# In[9]:
 
 
 # create map of Singapore place  using latitude and longitude values
@@ -217,15 +217,15 @@ for lat, lng, label in zip(SGnearby_venues['lat'], SGnearby_venues['lng'], SGnea
 map_sg
 
 
-# 3. A link to your Notebook on your Github repository, showing your code. (15 marks)
-# 
-#     Link for notebook in Github, 
+# # 3. A link to your Notebook on your Github repository, showing your code. (15 marks)
 
-# 4. A full report consisting of all of the following components (15 marks):
+# Link for notebook in Github is, https://github.com/chalst1988/Coursera_Capstone/blob/master/Capstone-%20The%20Battle%20of%20Neighborhoods%20-%20Week%201.ipynb
+
+# # 4. A full report consisting of all of the following components (15 marks):
 #     
-#     Attached in Github with name: The Battle of Neighborhoods_Report.pdf
+#     Attached in Github by name: The Battle of Neighborhoods_Report.pdf
 
-# 5. Your choice of a presentation or blogpost. (10 marks)
+# #  5. Your choice of a presentation or blogpost. (10 marks)
 # 
 #     Attached in Github by name: The Battle of Neighborhoods_Presentation.pdf
 # 
